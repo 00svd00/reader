@@ -8,6 +8,7 @@ import {
 import { BaseCloudProvider, type CloudProvider, type ProviderStatusEvent, type RemoteDocument } from './provider';
 import { t } from '../i18n';
 import type { ReadingSession } from '../reader/analytics';
+import { sha256 } from '../crypto';
 
 const SNAPSHOT_PREFIX = `chitalka-v${READER_STATE_VERSION}-`;
 const SYNC_DELAY = 2500;
@@ -54,8 +55,7 @@ function sortedJson(value: unknown): string {
 }
 
 async function contentHash(content: string): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return sha256(content);
 }
 
 export async function encodeAnalyticsSegment(session: ReadingSession): Promise<{ content: string; name: string }> {

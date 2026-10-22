@@ -1,4 +1,5 @@
 import type { PagerSnapshot } from './pager';
+import { randomUUID } from '../crypto';
 
 export const IDLE_ONE_PAGE_MS = 2 * 60_000;
 export const IDLE_TWO_PAGE_MS = 4 * 60_000;
@@ -182,7 +183,7 @@ export class ReadingSessionTracker {
       speedSamples: _speedSamples,
       ...session
     } = draft;
-    await this.save({ ...session, id: crypto.randomUUID(), endedAt: new Date(now).toISOString() });
+    await this.save({ ...session, id: randomUUID(), endedAt: new Date(now).toISOString() });
   }
 
   private createDraft(snapshot: PagerSnapshot, now: number): DraftSession {

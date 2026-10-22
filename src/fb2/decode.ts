@@ -1,5 +1,6 @@
 import { unzip } from 'fflate';
 import { t } from '../i18n';
+import { sha256 } from '../crypto';
 
 export interface DecodedFb2Source {
   format: 'fb2';
@@ -24,12 +25,6 @@ export interface DecodedEpubSource {
 export type DecodedBookSource = DecodedFb2Source | DecodedEpubSource;
 
 const ZIP_SIGNATURE = [0x50, 0x4b] as const;
-
-export async function sha256(bytes: Uint8Array): Promise<string> {
-  const source = new Uint8Array(bytes).buffer;
-  const digest = await crypto.subtle.digest('SHA-256', source);
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-}
 
 function hasZipSignature(bytes: Uint8Array): boolean {
   return bytes[0] === ZIP_SIGNATURE[0] && bytes[1] === ZIP_SIGNATURE[1];

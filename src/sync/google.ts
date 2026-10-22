@@ -1,5 +1,6 @@
 import { BaseCloudProvider, ProviderError, type RemoteDocument } from './provider';
 import { t } from '../i18n';
+import { randomUUID } from '../crypto';
 
 interface GoogleTokenResponse {
   access_token?: string;
@@ -157,7 +158,7 @@ export class GoogleDriveProvider extends BaseCloudProvider {
   }
 
   async upload(name: string, content: string): Promise<void> {
-    const boundary = `chitalka_${crypto.randomUUID().replaceAll('-', '')}`;
+    const boundary = `chitalka_${randomUUID().replaceAll('-', '')}`;
     const metadata = JSON.stringify({ name, parents: ['appDataFolder'], mimeType: 'application/json' });
     const body = [
       `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n`,

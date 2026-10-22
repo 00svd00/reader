@@ -233,6 +233,7 @@ const english = {
   'error.snapshotVerification': '{provider}: uploaded snapshot verification failed',
   'error.upload': 'Upload error',
   'error.syncFailed': 'Synchronization failed',
+  'loading.openUrl': 'Downloading {url}…',
 } as const;
 
 export type TranslationKey = keyof typeof english;
@@ -467,6 +468,7 @@ const russian: Record<TranslationKey, string> = {
   'error.snapshotVerification': '{provider}: проверка загруженного снимка не пройдена',
   'error.upload': 'Ошибка загрузки',
   'error.syncFailed': 'Синхронизация не удалась',
+  'loading.openUrl': 'Загружаю {url}…',
 };
 
 const dictionaries: Record<Language, Record<TranslationKey, string>> = {

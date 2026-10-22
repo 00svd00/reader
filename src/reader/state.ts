@@ -1,5 +1,6 @@
 import type { ReaderSettings } from '../settings';
 import type { BookPosition } from './storage';
+import { randomUUID } from '../crypto';
 
 export const READER_STATE_VERSION = 1;
 export const ANNOTATION_COLORS = ['purple', 'blue', 'green', 'yellow', 'orange', 'pink'] as const;
@@ -91,7 +92,7 @@ export interface SyncSnapshot {
 }
 
 export function createDeviceId(): string {
-  return crypto.randomUUID();
+  return randomUUID();
 }
 
 export function createEmptyReaderState(deviceId = createDeviceId()): ReaderState {

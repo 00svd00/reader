@@ -385,6 +385,21 @@ export class ChitalkaApp {
     this.mobileSafariViewportController.start();
     this.headerVisibility.reveal();
 
+    const urlParameter = new URLSearchParams(location.search).get('url');
+    if (urlParameter) {
+      this.setLoading('loading.openUrl', { url: urlParameter });
+      await showLoadingOverlay(t('loading.openUrl', { url: urlParameter }));
+      try {
+        const bookUrl = new URL(urlParameter, location.href);
+        await this.loadDecoded(await decodeBookUrl(bookUrl));
+      } catch (error) {
+        this.showError(error);
+      } finally {
+        hideLoadingOverlay();
+      }
+      return;
+    }
+
     try {
       await this.loadDecoded(await decodeBookUrl(demoBookUrl));
     } catch (error) {

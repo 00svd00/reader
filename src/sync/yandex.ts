@@ -1,5 +1,6 @@
 import { BaseCloudProvider, ProviderError, type RemoteDocument } from './provider';
 import { t } from '../i18n';
+import { sha256Bytes } from '../crypto';
 
 interface YandexCallbackMessage {
   type: 'chitalka:yandex-oauth';
@@ -19,8 +20,7 @@ function base64Url(bytes: Uint8Array): string {
 }
 
 async function pkceChallenge(verifier: string): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
-  return base64Url(new Uint8Array(digest));
+  return base64Url(await sha256Bytes(verifier));
 }
 
 function randomToken(length = 48): string {
