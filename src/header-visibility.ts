@@ -11,6 +11,9 @@ const SWIPE_MIN_DISTANCE = 48;
 const SWIPE_DISTANCE_RATIO = 0.18;
 const SWIPE_MIN_VELOCITY = 0.35;
 
+const SWIPE_FORWARD_DISTANCE_FACTOR = 0.75; // вперёд срабатывает на 25% раньше
+const SWIPE_FORWARD_VELOCITY_FACTOR = 0.6;  // и по скорости тоже мягче
+
 export type HeaderVisibilityMode = 'auto' | 'manual' | 'persistent';
 
 export function isShortTap(start: TouchPoint | undefined, end: TouchPoint): boolean {
@@ -138,18 +141,36 @@ export function swipeTurnDirection(
   sample: TouchSwipeSample,
   viewportWidth: number,
 ): -1 | 0 | 1 {
-  const requiredDistance = Math.max(
+  const baseDistance = Math.max(
     SWIPE_MIN_DISTANCE,
     Math.min(96, viewportWidth * SWIPE_DISTANCE_RATIO),
   );
-  if (
-    Math.abs(sample.distance) < requiredDistance
-    && Math.abs(sample.velocity) < SWIPE_MIN_VELOCITY
-  ) return 0;
-  const movement = Math.abs(sample.velocity) >= SWIPE_MIN_VELOCITY
-    ? sample.velocity
-    : sample.distance;
-  return movement < 0 ? 1 : -1;
+
+  // Направление определяем ТОЛЬКО по distance — это основное намерение.
+  // velocity используем лишь для подтверждения/усиления, но не для смены знака.
+  if (sample.distance === 0) {
+    // Если distance ровно 0 (маловероятно), доверяем velocity
+    if (Math.abs(sample.velocity) < SWIPE_MIN_VELOCITY) return 0;
+    return sample.velocity < 0 ? 1 : -1;
+  }
+
+  const forward = sample.distance < 0; // влево = вперёд
+  const requiredDistance = forward
+    ? baseDistance * SWIPE_FORWARD_DISTANCE_FACTOR
+    : baseDistance;
+  const requiredVelocity = forward
+    ? SWIPE_MIN_VELOCITY * SWIPE_FORWARD_VELOCITY_FACTOR
+    : SWIPE_MIN_VELOCITY;
+
+  // Скорость учитываем только если она согласуется по знаку с distance.
+  const velocityAgrees = Math.sign(sample.velocity) === Math.sign(sample.distance);
+  const useVelocity = velocityAgrees && Math.abs(sample.velocity) >= requiredVelocity;
+
+  if (Math.abs(sample.distance) < requiredDistance && !useVelocity) {
+    return 0;
+  }
+
+  return forward ? 1 : -1;
 }
 
 export function bindTouchSwipe(
